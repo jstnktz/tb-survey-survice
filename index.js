@@ -1,6 +1,14 @@
+require('dotenv').config();
 const express = require('express');
+const connectDB = require('./config/db');
 const app = express();
 const surveyRoutes = require('./routes/surveyRoutes');
+
+
+// Your existing imports...
+
+
+connectDB();
 
 // Middleware to parse JSON
 app.use(express.json());
