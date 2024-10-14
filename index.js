@@ -4,10 +4,6 @@ const connectDB = require('./config/db');
 const app = express();
 const surveyRoutes = require('./routes/surveyRoutes');
 
-
-// Your existing imports...
-
-
 connectDB();
 
 // Middleware to parse JSON
