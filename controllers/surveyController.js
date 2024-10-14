@@ -1,47 +1,50 @@
 const Survey = require('../models/surveyModel');
 
-const createSurvey = async (req, res) => {
+// Update an existing survey
+const updateSurvey = async (req, res) => {
     try {
-        // Extract survey details from the request body
-        const { title, questions } = req.body;
+        const { id } = req.params; // Extract survey ID from request parameters
+        const updatedData = req.body; // Extract updated survey data from request body
 
-        // Validate request body
-        // Ensure that the title is provided and questions is an array
-        if (!title || !questions || !Array.isArray(questions)) {
-            return res.status(400).json({ message: 'Invalid survey data. Ensure "title" and "questions" (array) are provided.' });
+        // Find the survey by ID and update it with the new data
+        const updatedSurvey = await Survey.findByIdAndUpdate(id, updatedData, { new: true });
+
+        // If the survey is not found, return a 404 response
+        if (!updatedSurvey) {
+            return res.status(404).json({ message: 'Survey not found' });
         }
 
-        // Create a new survey instance with the provided title and questions
-        const newSurvey = new Survey({ title, questions });
-
-        // Save the survey to the database
-        // This operation is asynchronous and will save the survey document to MongoDB
-        await newSurvey.save();
-
-        // Respond with success message and the newly created survey
-        res.status(201).json({ message: 'Survey created successfully', survey: newSurvey });
+        // Return the updated survey and success message
+        res.status(200).json({ message: 'Survey updated successfully', survey: updatedSurvey });
     } catch (err) {
-        // Handle server errors and respond with a 500 status code
+        // Handle server errors and return a 500 response
         res.status(500).json({ message: 'Server Error', error: err.message });
     }
 };
 
-const getSurveys = async (req, res) => {
+// Get survey questions by survey name
+const getSurveyByName = async (req, res) => {
     try {
-        // Fetch all surveys from the database
-        // This will return an array of all survey documents in the collection
-        const surveys = await Survey.find();
-        
-        // Respond with the list of surveys
-        res.status(200).json({ surveys });
+        const { name } = req.params; // Extract survey name from request parameters
+
+        // Fetch survey from the database by name
+        const survey = await Survey.findOne({ name });
+
+        // If the survey is not found, return a 404 response
+        if (!survey) {
+            return res.status(404).json({ message: 'Survey not found' });
+        }
+
+        // Return the survey questions
+        res.status(200).json({ surveyName: survey.name, questions: survey.questions });
     } catch (err) {
-        // Handle server errors and respond with a 500 status code
+        // Handle server errors and return a 500 response
         res.status(500).json({ message: 'Server Error', error: err.message });
     }
 };
 
 module.exports = {
     // Exporting the functions to be used in other parts of the application, such as route handlers
-    createSurvey,
-    getSurveys,
+    getSurveyByName,
+    updateSurvey,
 };

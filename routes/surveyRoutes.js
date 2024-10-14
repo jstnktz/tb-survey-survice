@@ -6,6 +6,6 @@ const { createSurvey, getSurveys } = require('../controllers/surveyController');
 router.post('/', createSurvey);
 
 // Get all surveys
-router.get('/', getSurveys);
+router.get('/', getSurveyByName);
 
 module.exports = router;
